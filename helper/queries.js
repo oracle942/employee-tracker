@@ -98,6 +98,8 @@ const updateEmployee = [{
         db.query(`SELECT id AS 'DEPARTMENT ID', name AS 'DEPARTMENT NAME' FROM department`, function (err, results) {
         console.table(results);
         });
+        init()
+
       }
     if (res.root === 'view all roles'){
       console.log(res.root)
@@ -117,13 +119,27 @@ const updateEmployee = [{
         JOIN employee ON employee.role_id = role.id`, function (err, results) {
         console.table(results);
         });
+
       }
-    if (res.root === 'add department'){
-    //  Add new department
+    if (res.root === 'add a department'){
+      inquirer.prompt(addDepartment).then( (res) => {
+            //  Add new department
         db.query(`INSERT into department (name) VALUES ('${res.department}')`, (err, data) =>{
+        if (err) console.log(err); init() })
+
+        });
+
+      }
+    if (res.root === 'add an employee'){
+      inquirer.prompt(addEmployee).then(
+    //  Add new department
+        db.query(`INSERT into employee (first_name) VALUES ('${res.first_name}'), 
+                  INSERT into employee (last_name) VALUES ('${res.last_name}'),
+                  INSERT into employee (role_id) VALUES ('${res.role_id}'),
+                  INSERT into employee (manager_id) VALUES ('${res.manager_id}')`, (err, data) =>{
         if (err) console.log(err)
-        console.log(data)
-        })
+        }));
+
       }
 
 
