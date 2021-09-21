@@ -7,6 +7,7 @@ Files can be downloaded from this GitHub repository. Once downloaded, the applic
 # Usage
 Run queries.js inside of a node terminal and follow the on screen instructions. 
  ![screenshot](screenshot.PNG)
+ https://watch.screencastify.com/v/kyWnNo2XFrBVQ6ez5IoH
 
 # License
 MIT
