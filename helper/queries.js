@@ -87,9 +87,9 @@ const updateEmployee = [{
 
  function init(){ 
   //  View all tables joined
-  // db.query('SELECT * FROM employee INNER JOIN role ON employee.id = role.id', function (err, results) {
-  //   console.log(console.table(results));
-  // });
+  db.query('SELECT * FROM employee INNER JOIN role ON employee.id = role.id', function (err, results) {
+    console.log(console.table(results));
+  });
    
   
   inquirer.prompt(rootOptions).then( (res) => {
