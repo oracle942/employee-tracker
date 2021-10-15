@@ -13,12 +13,13 @@ VALUES (001, "Salesperson", 80000, 001),
        (006, "Legal Team Lead", 250000, 004),
        (007, "Lawyer", 190000, 004);
 
-INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
-VALUES (001, "Mike", "Chan", 001),
-       (002, "Ashley", "Rodriguez", 002),
+INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
+VALUES (001, "Mike", "Chan", 001, NULL),
+       (002, "Ashley", "Rodriguez", 002, NULL),
        (003, "Kevin", "Tupik", 003, 002),
-       (004, "Kunal", "Singh", 004),
+       (004, "Kunal", "Singh", 004, NULL),
        (005, "Malia", "Brown", 005, 004),
-       (006, "Sarah", "Lourd", 006),
+       (006, "Sarah", "Lourd", 006, NULL),
        (007, "Tom", "Allen", 007, 006);
        
+SELECT * FROM employee
