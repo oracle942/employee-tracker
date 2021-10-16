@@ -42,25 +42,26 @@ const addDepartment = [
   },
 ];
 
-const addRole = [
+const addRole= (array) => [
   {
     type: 'input',
-    name: 'role_name',
+    name: 'title',
     message: 'Please enter the name of the role',
   },
   {
     type: 'input',
-    name: 'role_salary',
+    name: 'salary',
     message: 'Please enter the salary for the new role',
   },
   {
-    type: 'input',
-    name: 'role_dep',
+    type: 'list',
+    name: 'department_id',
     message: 'what department does the new role belong to?',
-  },
+    choices: array
+  }
 ];
 
-const addEmployee = [
+const addEmployee = (array) =>[
   {
     type: 'input',
     name: 'first_name',
@@ -72,14 +73,23 @@ const addEmployee = [
     message: "Please enter the employee's last name",
   },
   {
-    type: 'input',
-    name: 'role',
+    type: 'list',
+    name: 'role_id',
     message: "What is the employee's job title?",
+    choices: [
+      'Salesperson',
+      'Lead Engineer',
+      'Account Manager',
+      'Accountant',
+      'Legal Team Lead',
+      'Lawyer'
+    ]
   },
   {
-    type: 'input',
-    name: 'manager',
+    type: 'list',
+    name: 'manager_id',
     message: "Who is the employee's manager?",
+    choices: array
   },
 ];
 
@@ -155,20 +165,72 @@ function init() {
       });
     }
     if (res.root === 'add a role') {
-      inquirer.prompt(addRole).then((res) => {
-        //  Add new department
-        db.query(
-          `INSERT into role (name) VALUES ('${res.department}')`,
-          (err, data) => {
-            if (err) console.log(err);
-            init();
-          }
-        );
-      });
+      db.query('SELECT * FROM department', (err,data) =>{
+        if (err) console.log(err)
+        else {
+          const option = [{name: 'department name', value: 0}]
+          const formatted = [...data].map(department => {
+            return {name: department.name, value: department.id}
+          })
+          inquirer.prompt(addRole( formatted ) ).then((res) => {
+            console.log(res)
+            //  Add new role
+            db.query(
+              `INSERT into role (title, salary, department_id) VALUES ('${res.title}','${res.salary}','${res.department_id}')`,
+              (err, data) => {
+                if (err) console.log(err);
+                init();
+              }
+            );
+          });
+          
+
+        }
+      } )
+     
     }
     if (res.root === 'add an employee') {
-      inquirer.prompt(addEmployee).then(
-        //  Add new department
+      db.query('SELECT * FROM department', (err,data) =>{
+        if (err) console.log(err)
+        else {
+          const option = [{name: 'department name', value: 0}]
+          const formatted = [...data].map(department => {
+            return {name: department.name, value: department.id}
+          })
+          inquirer.prompt(addEmployee( formatted ) ).then((res) => {
+            console.log(res)
+            //  Add new employee
+            db.query(
+              `INSERT into employee (first_name, last_name, role_id, manager_id) VALUES ('${res.first_name}','${res.last_name}','${res.role_id}','${res.manager_id}')`,
+              (err, data) => {
+                if (err) console.log(err);
+                init();
+              }
+            );
+          });
+          
+
+        }
+      } )
+     
+    }
+    // if (res.root === 'add an employee') {
+    //   inquirer.prompt(addEmployee).then( (res) =>{
+    //     //  Add new employee
+    //     db.query(
+    //       `INSERT into employee (first_name) VALUES ('${res.first_name}'), 
+    //               INSERT into employee (last_name) VALUES ('${res.last_name}'),
+    //               INSERT into employee (role_id) VALUES ('${res.role_id}'),
+    //               INSERT into employee (manager_id) VALUES ('${res.manager_id}')`,
+    //       (err, data) => {
+    //         if (err) console.log(err);
+    //       }
+    //     )
+    //     });
+    // }
+    if (res.root === 'update an employee role') {
+      inquirer.prompt(updateEmployee).then( (res) =>{
+        //  Update an employee role
         db.query(
           `INSERT into employee (first_name) VALUES ('${res.first_name}'), 
                   INSERT into employee (last_name) VALUES ('${res.last_name}'),
@@ -178,9 +240,18 @@ function init() {
             if (err) console.log(err);
           }
         )
-      );
+        });
     }
   });
 }
 
 init();
+
+
+
+query classes 
+  {
+    name
+    professor
+  
+}
