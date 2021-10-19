@@ -15,9 +15,6 @@ const db = mysql.createConnection(
   console.log(`Connected to the content management system database.`)
 );
 
-// const employeeArr = []
-// const departmentsArr =  db.query(`SELECT * FROM department`, (err, res) => res.map(res))
-
 const rootOptions = [
   {
     type: 'list',
@@ -42,7 +39,7 @@ const addDepartment = [
   },
 ];
 
-const addRole= (array) => [
+const addRole = (array) => [
   {
     type: 'input',
     name: 'title',
@@ -57,11 +54,11 @@ const addRole= (array) => [
     type: 'list',
     name: 'department_id',
     message: 'what department does the new role belong to?',
-    choices: array
-  }
+    choices: array,
+  },
 ];
 
-const addEmployee = (array) =>[
+const addEmployee = (array1, array2) => [
   {
     type: 'input',
     name: 'first_name',
@@ -76,46 +73,33 @@ const addEmployee = (array) =>[
     type: 'list',
     name: 'role_id',
     message: "What is the employee's job title?",
-    choices: [
-      'Salesperson',
-      'Lead Engineer',
-      'Account Manager',
-      'Accountant',
-      'Legal Team Lead',
-      'Lawyer'
-    ]
+    choices: array2,
   },
   {
     type: 'list',
     name: 'manager_id',
     message: "Who is the employee's manager?",
-    choices: array
+    choices: array1,
   },
 ];
 
-const updateEmployee = [
+const updateEmployee = (array1, array2)  => [
   {
     type: 'list',
-    name: 'employee_update',
+    name: 'employee_id',
     message: 'Please select and employee to update',
-    choices: [''],
+    choices: array1,
   },
   {
-    type: 'input',
-    name: 'new_role',
+    type: 'list',
+    name: 'role_id',
     message: 'Please enter the job title',
+    choices: array2,
+
   },
 ];
 
 function init() {
-  //  View all tables joined
-  // db.query(
-  //   'SELECT * FROM employee INNER JOIN role ON employee.id = role.id',
-  //   function (err, results) {
-  //     console.log(console.table(results));
-  //   }
-  // );
-
   inquirer.prompt(rootOptions).then((res) => {
     if (res.root === 'view all departments') {
       // View all departments
@@ -123,9 +107,10 @@ function init() {
         `SELECT id AS 'DEPARTMENT ID', name AS 'DEPARTMENT NAME' FROM department`,
         function (err, results) {
           console.table(results);
+          init();
+
         }
       );
-      init();
     }
     if (res.root === 'view all roles') {
       console.log(res.root);
@@ -135,9 +120,10 @@ function init() {
         role.salary as 'SALARY' FROM department JOIN role ON role.department_id = department.id`,
         function (err, results) {
           console.table(results);
+          init();
+
         }
       );
-      init();
     }
     if (res.root === 'view all employees') {
       // View all employees
@@ -148,9 +134,10 @@ function init() {
         JOIN employee ON employee.role_id = role.id`,
         function (err, results) {
           console.table(results);
+          init();
+
         }
       );
-      init()
     }
     if (res.root === 'add a department') {
       inquirer.prompt(addDepartment).then((res) => {
@@ -165,15 +152,15 @@ function init() {
       });
     }
     if (res.root === 'add a role') {
-      db.query('SELECT * FROM department', (err,data) =>{
-        if (err) console.log(err)
+      db.query('SELECT * FROM department', (err, data) => {
+        if (err) console.log(err);
         else {
-          const option = [{name: 'department name', value: 0}]
-          const formatted = [...data].map(department => {
-            return {name: department.name, value: department.id}
-          })
-          inquirer.prompt(addRole( formatted ) ).then((res) => {
-            console.log(res)
+          // const option = [{name: 'department name', value: 0}]
+          const formatted = [...data].map((department) => {
+            return { name: department.name, value: department.id };
+          });
+          inquirer.prompt(addRole(formatted)).then((res) => {
+            console.log(res);
             //  Add new role
             db.query(
               `INSERT into role (title, salary, department_id) VALUES ('${res.title}','${res.salary}','${res.department_id}')`,
@@ -183,75 +170,77 @@ function init() {
               }
             );
           });
-          
-
         }
-      } )
-     
+      });
     }
     if (res.root === 'add an employee') {
-      db.query('SELECT * FROM department', (err,data) =>{
-        if (err) console.log(err)
+      db.query('SELECT * FROM employee', (err, data) => {
+        if (err) console.log(err);
         else {
-          const option = [{name: 'department name', value: 0}]
-          const formatted = [...data].map(department => {
-            return {name: department.name, value: department.id}
-          })
-          inquirer.prompt(addEmployee( formatted ) ).then((res) => {
-            console.log(res)
-            //  Add new employee
-            db.query(
-              `INSERT into employee (first_name, last_name, role_id, manager_id) VALUES ('${res.first_name}','${res.last_name}','${res.role_id}','${res.manager_id}')`,
-              (err, data) => {
-                if (err) console.log(err);
-                init();
-              }
-            );
+          // const option = [{name: 'department name', value: 0}]
+          const formatted1 = [...data].map((employee) => {
+            return { name: employee.first_name, value: employee.id };
           });
-          
-
-        }
-      } )
-     
-    }
-    // if (res.root === 'add an employee') {
-    //   inquirer.prompt(addEmployee).then( (res) =>{
-    //     //  Add new employee
-    //     db.query(
-    //       `INSERT into employee (first_name) VALUES ('${res.first_name}'), 
-    //               INSERT into employee (last_name) VALUES ('${res.last_name}'),
-    //               INSERT into employee (role_id) VALUES ('${res.role_id}'),
-    //               INSERT into employee (manager_id) VALUES ('${res.manager_id}')`,
-    //       (err, data) => {
-    //         if (err) console.log(err);
-    //       }
-    //     )
-    //     });
-    // }
-    if (res.root === 'update an employee role') {
-      inquirer.prompt(updateEmployee).then( (res) =>{
-        //  Update an employee role
-        db.query(
-          `INSERT into employee (first_name) VALUES ('${res.first_name}'), 
-                  INSERT into employee (last_name) VALUES ('${res.last_name}'),
-                  INSERT into employee (role_id) VALUES ('${res.role_id}'),
-                  INSERT into employee (manager_id) VALUES ('${res.manager_id}')`,
-          (err, data) => {
+          db.query('SELECT * FROM role', (err, data) => {
             if (err) console.log(err);
-          }
-        )
-        });
+            else {
+              const formatted2 = [...data].map((role) => {
+                return { name: role.title, value: role.id };
+              });
+
+              inquirer
+                .prompt(addEmployee(formatted1, formatted2))
+                .then((res) => {
+                  console.log(res);
+                  //  Add new employee
+                  db.query(
+                    `INSERT into employee (first_name, last_name, role_id, manager_id) VALUES ('${res.first_name}','${res.last_name}','${res.role_id}','${res.manager_id}')`,
+                    (err, data) => {
+                      if (err) console.log(err);
+                      init();
+                    }
+                  );
+                });
+            }
+          });
+        }
+      });
+    }
+
+    if (res.root === 'update an employee role') {
+      db.query('SELECT * FROM employee', (err, data) => {
+        if (err) console.log(err);
+        else {
+          // const option = [{name: 'department name', value: 0}]
+          const formatted1 = [...data].map((employee) => {
+            return { name: employee.first_name, value: employee.id };
+          });
+          db.query('SELECT * FROM role', (err, data) => {
+            if (err) console.log(err);
+            else {
+              const formatted2 = [...data].map((role) => {
+                return { name: role.title, value: role.id };
+              });
+              inquirer.prompt(updateEmployee(formatted1, formatted2)).then((res) => {
+                //  Update an employee role
+                db.query(
+                  `UPDATE employee SET role_id  = ${res.role_id} WHERE id = ${res.employee_id} `,
+        
+                  (err, data) => {
+                    if (err) console.log(err);
+                    init()
+                  }
+                );
+              });
+             
+            }
+          });
+        }
+      });
+     
+    
     }
   });
 }
 
 init();
-
-
-
-query classes 
-  {
-    name
-    professor
-  
-}
